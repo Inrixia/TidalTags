@@ -1,93 +1,55 @@
-let itemsToProcess = [];
+const itemsToProcess = {};
 
-// Helper function to check if item exists in itemsToProcess array
-function itemExists(id) {
-	return itemsToProcess.some((item) => item.id === id);
-}
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-	console.log(request, sender);
-	// todo cleanup this monstrocity
-	let newItems = request.data.filter((item) => !itemExists(item.id));
-	itemsToProcess.push(...newItems); // Store the items
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	console.log(request);
+	for (const item of request.data) {
+		itemsToProcess[item.id] ??= item;
+	}
 	processItems();
 	sendResponse();
 });
 
-const style = document.createElement("style");
-style.textContent = `
-.tag {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0 8px;
-    height: 18px;
-    font-size: 12px;
-    line-height: 20px;
-    border-radius: 16px;
-    color: rgba(0, 0, 0, 0.87); /* Text color */
-    box-sizing: border-box;
-    transition: background-color 0.2s;
-    margin-left: 5px;
-}
-.tag-mqa {
-    background-color: #ffd700; /* Golden color */
-}
-.tag-hr {
-    background-color: #b9f2ff; /* Diamond-like color */
-}
-.tag-atmos {
-	background-color: #003366; /* Dark blue color */
-}
-.tag:hover {
-    background-color: #d0d0d0; /* Change color when mouse is over */
-}
-`;
-document.head.appendChild(style);
+// Cache class name and text content pairs to reduce lookup time
+const tagData = {
+	MQA: { className: "tag tag-mqa", textContent: "MQA" },
+	HIRES_LOSSLESS: { className: "tag tag-hr", textContent: "HiRes" },
+	DOLBY_ATMOS: { className: "tag tag-atmos", textContent: "Atmos" },
+};
 
 const processItems = () => {
 	// Stop observing
 	observer.disconnect();
 
-	for (const item of itemsToProcess) {
-		const firstSpan = document.querySelectorAll(`span[data-id='${item.id}']`).item(0);
+	for (const key in itemsToProcess) {
+		const item = itemsToProcess[key];
+
+		// Cache the querySelectorAll result
+		const firstSpan = document.querySelector(`span[data-id='${item.id}']`);
+
 		if (firstSpan) {
-			// Get the current text content of the span
-			const currentText = firstSpan.textContent;
+			// Initialize originalText with currentText if it's not already defined
+			item.originalText ??= firstSpan.textContent;
 
-			// Check if the original text content is stored on the item
-			// If not, store the current text content as the original text content
-			if (item.originalText === undefined) item.originalText = currentText;
+			if (firstSpan.textContent === item.originalText) {
+				// Using documentFragment to minimize browser reflow
+				const fragment = document.createDocumentFragment();
 
-			// If the current text content is the same as the original text content
-			if (currentText === item.originalText) {
 				for (const tag of item.mediaMetadata.tags) {
-					let className;
-					let textContent;
-					switch (tag) {
-						case "LOSSLESS":
-							continue;
-						case "MQA":
-							className = "tag tag-mqa";
-							textContent = "MQA";
-							break;
-						case "HIRES_LOSSLESS":
-							className = "tag tag-hr";
-							textContent = "HiRes";
-							break;
-						case "DOLBY_ATMOS":
-							className = "tag tag-atmos";
-							textContent = "Atmos";
-					}
+					if (tag === "LOSSLESS") continue;
+
+					const data = tagData[tag];
+					if (!data) continue;
+
 					const tagElement = document.createElement("span");
-					tagElement.className = className;
-					tagElement.textContent = textContent;
-					firstSpan.appendChild(tagElement);
-					firstSpan.appendChild(document.createTextNode(" "));
+					tagElement.className = data.className;
+					tagElement.textContent = data.textContent;
+
+					fragment.appendChild(tagElement);
+					fragment.appendChild(document.createTextNode(" "));
 				}
+				firstSpan.appendChild(fragment);
 			}
 		}
-		console.log("updated!");
 	}
 
 	// Start observing again
@@ -105,4 +67,3 @@ const observer = new MutationObserver(debouncedProcessItems);
 
 // Start observing the document with the configured parameters
 observer.observe(document.body, { childList: true, subtree: true });
-console.log("Loaded!");

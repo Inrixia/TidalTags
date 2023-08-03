@@ -1,17 +1,13 @@
-let requestIds = new Set();
+const requestIds = new Set();
 const requestItems = {};
+
 let Authorization = "";
 
-// Use async/await to get data from chrome.storage.sync
-(async () => {
-	const data = await new Promise((resolve) => chrome.storage.sync.get({ stringSetting: "" }, resolve));
-	Authorization = data.stringSetting;
-})();
-
-chrome.storage.onChanged.addListener((changes, area) => {
-	if (changes.stringSetting) {
-		Authorization = changes.stringSetting.newValue;
-	}
+chrome.storage.sync.get({ Authorization: "" }, (data) => {
+	Authorization = data.Authorization;
+});
+chrome.storage.onChanged.addListener((changes) => {
+	if (changes.Authorization) Authorization = changes.Authorization.newValue;
 });
 
 chrome.webRequest.onBeforeRequest.addListener(
@@ -19,17 +15,14 @@ chrome.webRequest.onBeforeRequest.addListener(
 		if (Authorization === "") return;
 		// Check if the request has been resent
 		if (requestIds.has(details.url)) {
-			console.log("This request was resent by the extension.", requestItems[details.url]);
-			sendItems(requestItems[details.url]);
-			return;
+			console.log("Using cached data...", details.url);
+			return sendItems(requestItems[details.url]);
 		}
 
-		const weWant = details.url.includes("/pages/album") || details.url.includes("/favorites/tracks");
-		console.log(details.url, weWant);
+		console.log("Fetching...", details.url);
 
 		// Check if the method of the request is GET
-		if (details.method === "GET" && weWant) {
-			console.log("A request has been made:", details.url, weWant);
+		if (details.method === "GET") {
 			// Add the request id to the Set of resent requests
 			requestIds.add(details.url);
 
@@ -54,36 +47,26 @@ chrome.webRequest.onBeforeRequest.addListener(
 			}
 		}
 	},
-	{ urls: ["https://listen.tidal.com/*"] }
+	{ urls: ["https://listen.tidal.com/*/pages/album*", "https://listen.tidal.com/*/favorites/tracks*"] }
 );
 
-function sendItems(items) {
-	if (!items) return;
+const sendItems = (data) => {
+	if (data === undefined) return;
+	if (data.length === 0) return;
 	// Send a message to the content script
-	chrome.tabs.query({ active: true, currentWindow: true, url: "https://listen.tidal.com/*" }, function (tabs) {
-		// tabs is an array of tabs that match the query
-		var activeTab = tabs[0];
-		if (activeTab) {
-			chrome.tabs.sendMessage(activeTab.id, { data: items }, function (response) {
-				if (chrome.runtime.lastError) {
-					console.error(chrome.runtime.lastError.message);
-				} else {
-					console.log(response);
-				}
-			});
-		}
+	chrome.tabs.query({ active: true, currentWindow: true, url: "https://listen.tidal.com/*" }, ([activeTab]) => {
+		if (activeTab) chrome.tabs.sendMessage(activeTab.id, { data });
 	});
-}
+};
 
-function searchForKey(obj, key) {
+const searchForKey = (obj, key) => {
 	let result = [];
-	function recursiveSearch(input) {
+	const recursiveSearch = (input) => {
 		if (typeof input !== "object" || input === null) return;
 
 		if (input.hasOwnProperty(key)) result.push(input);
 		Object.values(input).forEach(recursiveSearch);
-	}
-
+	};
 	recursiveSearch(obj);
 	return result;
-}
+};
