@@ -41,7 +41,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 				if (contentType && contentType.includes("application/json")) {
 					const data = await response.json();
 					const items = searchForKey(data, "mediaMetadata");
-					requestItems[details.url] = items.filter((item) => item.album !== undefined);
+					requestItems[details.url] = items.filter((item) => item.album !== undefined && item.mediaMetadata.tags.length > 1);
 					sendItems(requestItems[details.url]);
 				}
 			} catch (error) {
@@ -49,7 +49,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 			}
 		}
 	},
-	{ urls: [`${tdl}pages/album*`, `${tdl}favorites/tracks*`, `${tdl}pages/home*`, `${tdl}playlists/*/items*`, `${tdl}pages/mix*`] }
+	{ urls: [`${tdl}pages/album*`, `${tdl}favorites/tracks*`, `${tdl}pages/home*`, `${tdl}playlists/*/items*`, `${tdl}pages/mix*`, `${tdl}pages/artist*`] }
 );
 
 const sendItems = (data) => {
