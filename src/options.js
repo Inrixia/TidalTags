@@ -4,23 +4,20 @@ const inputSettingElement = document.getElementById("inputSetting");
 const saveButton = document.getElementById("saveButton");
 const statusMessageElement = document.getElementById("statusMessage");
 
-// Function to update the input element with the current setting value
-const updateInputSetting = (value) => (inputSettingElement.value = value);
-
-// Function to save the setting to chrome.storage.sync
-const saveSetting = (value) => {
-	chrome.storage.sync.set({ Authorization: value }, function () {
+const saveSetting = (Authorization) => {
+	chrome.storage.local.set({ Authorization }, () => {
+		// After the data is saved, retrieve the data again to verify it
+		fetchSetting();
 		// Update the status message to show that the setting was saved
 		statusMessageElement.textContent = "Setting saved.";
 		// Clear the status message after 1.5 seconds
-		setTimeout(() => {
-			statusMessageElement.textContent = "";
-		}, 1500);
+		setTimeout(() => (statusMessageElement.textContent = ""), 1500);
 	});
 };
 
-// Restore the saved setting when the options page loads
-chrome.storage.sync.get({ Authorization: "" }, (data) => updateInputSetting(data.Authorization));
+const setAuth = (data) => (inputSettingElement.value = data?.Authorization ?? "");
+const fetchSetting = () => chrome.storage.local.get("Authorization", setAuth);
 
+fetchSetting();
 // Save the setting when the user clicks the save button
 saveButton.addEventListener("click", () => saveSetting(inputSettingElement.value));

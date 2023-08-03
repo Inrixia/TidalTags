@@ -4,7 +4,6 @@
 	"version": "1.0",
 	"permissions": [
 		"webRequest",
-		"https://listen.tidal.com/*",
 		"storage"
 	],
 	"host_permissions": [
@@ -19,12 +18,14 @@
 				"https://listen.tidal.com/*"
 			],
 			"js": [
-				"content.js",
-				"style.js"
+				"content.js"
+			],
+			"css": [
+				"style.css"
 			]
 		}
 	],
 	"action": {
-		"default_popup": "./gui/options.html"
+		"default_popup": "options.html"
 	}
 }

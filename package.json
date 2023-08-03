@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build:chrome": "parcel build src/* --out-dir build/chrome --public-url .",
+    "build:firefox": "parcel build src/* --out-dir build/firefox --public-url .",
+    "build": "node cleanBuild.js && npm run build:chrome && npm run build:firefox"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5"
+  }
+}

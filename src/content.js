@@ -1,7 +1,6 @@
 const itemsToProcess = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	console.log(request);
 	for (const item of request.data) {
 		itemsToProcess[item.id] ??= item;
 	}

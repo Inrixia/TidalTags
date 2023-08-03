@@ -3,12 +3,8 @@ const requestItems = {};
 
 let Authorization = "";
 
-chrome.storage.sync.get({ Authorization: "" }, (data) => {
-	Authorization = data.Authorization;
-});
-chrome.storage.onChanged.addListener((changes) => {
-	if (changes.Authorization) Authorization = changes.Authorization.newValue;
-});
+// Restore the saved setting when the options page loads
+chrome.storage.local.get("Authorization", (data) => (Authorization = data?.Authorization ?? ""));
 
 const tdl = "https://listen.tidal.com/*";
 
@@ -32,7 +28,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 				const response = await fetch(details.url, {
 					method: details.method,
 					headers: {
-						Authorization,
+						Authorization: Authorization,
 					},
 				});
 
