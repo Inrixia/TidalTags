@@ -1,0 +1,25 @@
+{
+	"manifest_version": 3,
+	"name": "TidalTags",
+	"version": "1.0",
+	"permissions": [
+		"webRequest",
+		"https://listen.tidal.com/*"
+	],
+	"host_permissions": [
+		"https://listen.tidal.com/*"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://listen.tidal.com/*"
+			],
+			"js": [
+				"content.js"
+			]
+		}
+	]
+}
