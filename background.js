@@ -10,6 +10,8 @@ chrome.storage.onChanged.addListener((changes) => {
 	if (changes.Authorization) Authorization = changes.Authorization.newValue;
 });
 
+const tdl = "https://listen.tidal.com/*";
+
 chrome.webRequest.onBeforeRequest.addListener(
 	async function (details) {
 		if (Authorization === "") return;
@@ -47,14 +49,14 @@ chrome.webRequest.onBeforeRequest.addListener(
 			}
 		}
 	},
-	{ urls: ["https://listen.tidal.com/*/pages/album*", "https://listen.tidal.com/*/favorites/tracks*"] }
+	{ urls: [`${tdl}pages/album*`, `${tdl}favorites/tracks*`, `${tdl}pages/home*`, `${tdl}playlists/*/items*`, `${tdl}pages/mix*`] }
 );
 
 const sendItems = (data) => {
 	if (data === undefined) return;
 	if (data.length === 0) return;
 	// Send a message to the content script
-	chrome.tabs.query({ active: true, currentWindow: true, url: "https://listen.tidal.com/*" }, ([activeTab]) => {
+	chrome.tabs.query({ active: true, currentWindow: true, url: tdl }, ([activeTab]) => {
 		if (activeTab) chrome.tabs.sendMessage(activeTab.id, { data });
 	});
 };
