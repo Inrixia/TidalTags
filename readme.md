@@ -1,6 +1,9 @@
 # TidalTags Browser Extension
 TidalTags is a Chrome/Firefox extension that adds quality tags to songs in the Tidal Web Player.
 
+This is very much not polished and is only really intended to be used as a reference for testing. 
+I dont have any plans to actually publish it etc.
+
 ## Install
 1. Download the extension zip for your browser from https://github.com/Inrixia/TidalTags/releases/tag/latest
 2. Unzip the files into a folder.
