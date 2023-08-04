@@ -22,16 +22,14 @@ jobs:
       npm run build
 
    - name: Zip Chrome extension
-     uses: thedoctor0/zip-release@0.4.0
-     with:
-      filename: "chrome-extension.zip"
-      path: "build/chrome"
+     run: |
+      cd build/chrome
+      zip -r ../../chrome-extension.zip .
 
    - name: Zip Firefox extension
-     uses: thedoctor0/zip-release@0.4.0
-     with:
-      filename: "firefox-extension.zip"
-      path: "build/firefox"
+     run: |
+      cd build/firefox
+      zip -r ../../firefox-extension.zip .
 
    - name: Draft release on GitHub
      uses: "marvinpinto/action-automatic-releases@latest"

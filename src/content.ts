@@ -1,4 +1,4 @@
-const itemsToProcess = {};
+const itemsToProcess: Record<string, Item> = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	for (const item of request.data) {
@@ -55,7 +55,7 @@ const processItems = () => {
 	observer.observe(document.body, { childList: true, subtree: true });
 };
 
-let timeoutId = null;
+let timeoutId: number;
 // Debounced processItems function
 function debouncedProcessItems() {
 	clearTimeout(timeoutId);

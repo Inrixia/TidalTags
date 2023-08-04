@@ -5,6 +5,8 @@
     "build": "node cleanBuild.js && npm run build:chrome && npm run build:firefox"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5"
+    "@types/chrome": "^0.0.243",
+    "parcel-bundler": "^1.12.5",
+    "typescript": "^5.1.6"
   }
 }

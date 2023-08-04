@@ -1,5 +1,5 @@
 const requestIds = new Set();
-const requestItems = {};
+const requestItems: Record<string, Item[]> = {};
 
 let Authorization = "";
 
@@ -9,7 +9,8 @@ chrome.storage.local.get("Authorization", (data) => (Authorization = data?.Autho
 const tdl = "https://listen.tidal.com/*";
 
 chrome.webRequest.onBeforeRequest.addListener(
-	async function (details) {
+	// @ts-expect-error Dont care the browser will take a promise without worry
+	async (details) => {
 		if (Authorization === "") return;
 		// Check if the request has been resent
 		if (requestIds.has(details.url)) {
@@ -48,21 +49,21 @@ chrome.webRequest.onBeforeRequest.addListener(
 	{ urls: [`${tdl}pages/album*`, `${tdl}favorites/tracks*`, `${tdl}pages/home*`, `${tdl}playlists/*/items*`, `${tdl}pages/mix*`, `${tdl}pages/artist*`] }
 );
 
-const sendItems = (data) => {
+const sendItems = (data: unknown[]) => {
 	if (data === undefined) return;
 	if (data.length === 0) return;
 	// Send a message to the content script
 	chrome.tabs.query({ active: true, currentWindow: true, url: tdl }, ([activeTab]) => {
-		if (activeTab) chrome.tabs.sendMessage(activeTab.id, { data });
+		if (activeTab.id) chrome.tabs.sendMessage(activeTab.id, { data });
 	});
 };
 
-const searchForKey = (obj, key) => {
-	let result = [];
-	const recursiveSearch = (input) => {
+const searchForKey = (obj: unknown, key: string): Item[] => {
+	let result: Item[] = [];
+	const recursiveSearch = (input: unknown) => {
 		if (typeof input !== "object" || input === null) return;
 
-		if (input.hasOwnProperty(key)) result.push(input);
+		if (input.hasOwnProperty(key)) result.push(<Item>input);
 		Object.values(input).forEach(recursiveSearch);
 	};
 	recursiveSearch(obj);
