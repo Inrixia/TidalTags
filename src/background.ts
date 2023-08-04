@@ -1,16 +1,13 @@
 const requestIds = new Set();
 const requestItems: Record<string, Item[]> = {};
 
-let Authorization = "";
-
-// Restore the saved setting when the options page loads
-chrome.storage.local.get("Authorization", (data) => (Authorization = data?.Authorization ?? ""));
-
 const tdl = "https://listen.tidal.com/*";
 
 chrome.webRequest.onBeforeRequest.addListener(
 	// @ts-expect-error Dont care the browser will take a promise without worry
 	async (details) => {
+		const data = await new Promise<Record<string, string>>((res) => chrome.storage.local.get("Authorization", res));
+		const Authorization = data?.Authorization ?? "";
 		if (Authorization === "") return;
 		// Check if the request has been resent
 		if (requestIds.has(details.url)) {
