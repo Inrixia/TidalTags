@@ -27,9 +27,9 @@ const processItems = () => {
 
 		if (firstSpan) {
 			// Initialize originalText with currentText if it's not already defined
-			item.originalText ??= firstSpan.textContent;
+			item.originalHTML ??= firstSpan.innerHTML;
 
-			if (firstSpan.textContent === item.originalText) {
+			if (firstSpan.innerHTML === item.originalHTML) {
 				// Using documentFragment to minimize browser reflow
 				const fragment = document.createDocumentFragment();
 
@@ -40,11 +40,11 @@ const processItems = () => {
 					if (!data) continue;
 
 					const tagElement = document.createElement("span");
+
 					tagElement.className = data.className;
 					tagElement.textContent = data.textContent;
 
 					fragment.appendChild(tagElement);
-					fragment.appendChild(document.createTextNode(" "));
 				}
 				firstSpan.appendChild(fragment);
 			}
