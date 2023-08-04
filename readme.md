@@ -5,8 +5,8 @@ TidalTags is a Chrome/Firefox extension that adds quality tags to songs in the T
 1. Download the extension zip for your browser from https://github.com/Inrixia/TidalTags/releases/tag/latest
 2. Unzip the files into a folder.
 3. Install the extension:  
-For **Firefox** go to `chrome://extensions/` make sure `Developer mode` in the top right is on. Click `Load unpacked` in the top left and select the folder with the extracted files.  
-For **Chrome** go to `about:debugging#/runtime/this-firefox` and click `Load Temporary Add-on`, select any file in the folder of extracted files. 
+For **Chrome** go to `chrome://extensions/` make sure `Developer mode` in the top right is on. Click `Load unpacked` in the top left and select the folder with the extracted files.  
+For **Firefox** go to `about:debugging#/runtime/this-firefox` and click `Load Temporary Add-on`, select any file in the folder of extracted files. 
 4. Open dev-tools on the Tidal Web App and copy the Authorization header off any request:  
 ![image](https://github.com/Inrixia/TidalTags/assets/6373693/c5d15b5c-68ba-4f49-a37b-bb6614ca65b4)
 5. Paste it into the extension settings:  
