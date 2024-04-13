@@ -1,4 +1,5 @@
-## There is now a desktop version, please use that over this [Inrixia/neptune-plugins](https://github.com/Inrixia/neptune-plugins)
+# DEPRECATED
+## Use the desktop version [Inrixia/neptune-plugins](https://github.com/Inrixia/neptune-plugins)
 
 # TidalTags Browser Extension
 TidalTags is a Chrome/Firefox extension that adds quality tags to songs in the Tidal Web Player.
